@@ -13,9 +13,14 @@ struct semaphore {
 
 sem_t sem_create(size_t count)
 {
+	enter_critical_section();
+
 	sem_t newSem = malloc(sizeof(sem_t));
 	newSem->count = count;
 	newSem->blockedQueue = queue_create();
+
+	exit_critical_section();	
+
 	return newSem;
 	/* TODO Phase 1 */
 }
