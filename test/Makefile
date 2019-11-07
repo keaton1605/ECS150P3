@@ -3,7 +3,8 @@ programs := \
 	sem_count.x \
 	sem_buffer.x \
 	sem_prime.x \
-	tps.x
+	tps.x \
+	tps22test.x
 
 # User-level thread library
 UTHREADLIB := libuthread
@@ -42,6 +43,7 @@ endif
 
 # Linker options
 LDFLAGS := -L$(UTHREADPATH) -luthread
+LDFLAGS += -Wl,--wrap=mmap
 
 # Include path
 INCLUDE := -I$(UTHREADPATH)
