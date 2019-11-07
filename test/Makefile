@@ -43,7 +43,7 @@ endif
 
 # Linker options
 LDFLAGS := -L$(UTHREADPATH) -luthread
-LDFLAGS += -Wl,--wrap=mmap
+tps22test.x: LDFLAGS += -Wl,--wrap=mmap
 
 # Include path
 INCLUDE := -I$(UTHREADPATH)
