@@ -9,7 +9,7 @@
 #include <sem.h>
 
 //static char msg1[TPS_SIZE] = "Hello world!\n";
-//static char msg2[TPS_SIZE] = "hello world!\n";
+static char msg2[TPS_SIZE] = "hello world!\n";
 
 //static sem_t sem1, sem2;
 
@@ -26,14 +26,44 @@ void *__wrap_mmap(void *addr, size_t len, int prot, int flags, int fildes, off_t
 
 void *thread1(void* arg)
 {
+	char *buffer = malloc(TPS_SIZE);
 	/* Create TPS */
 	tps_create();
+	tps_write(0, TPS_SIZE, msg2);
+
+	memset(buffer, 0, TPS_SIZE);
+	tps_read(0, TPS_SIZE, buffer);
+	printf("%s\n", buffer);
+	
+
 
 	/* Get TPS page address as allocated via mmap() */
-	char *tps_addr = latest_mmap_addr;
+	// char *tps_addr = latest_mmap_addr;
 	
 	/* Cause an intentional TPS protection error */
-	tps_addr[0] = '\0';
+	// tps_addr[0] = '\0';
+	return NULL;
+}
+
+void test_read(char *buff) {
+	// memset(buff, 0, TPS_SIZE);
+	// tps_read(0, TPS_SIZE, buff);
+	printf("%s\n", buff);
+	assert(!memcmp(msg2, buff, TPS_SIZE));
+	printf("thread2: read OK!\n");
+}
+
+void *thread2(void* arg) {
+
+	char *buffer = malloc(TPS_SIZE);
+
+
+	// char *tps_addr = latest_mmap_addr;
+	tps_read(0, TPS_SIZE, buffer);
+	printf("%s\n", buffer);
+
+	test_read(buffer);
+	// tps_addr[0] = '\0';
 	return NULL;
 }
 
@@ -46,6 +76,7 @@ int main(int argc, char **argv)
 
 	/* Create thread 1 and wait */
 	pthread_create(&tid, NULL, thread1, NULL);
+	pthread_create(&tid, NULL, thread2, NULL);
 	pthread_join(tid, NULL);
 
 	return 0;

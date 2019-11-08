@@ -101,6 +101,13 @@ int tps_init(int segv)
 
 int tps_create(void)
 {
+	queue_iterate(tpsQueue, findTid, (void*)tid, (void**)&currTps);
+	
+	if (currTps) {
+		exit_critical_section();
+		return -1;
+	}
+
 	tps_p newTps = malloc(sizeof(tps_p));
 	void* mMap;
 
