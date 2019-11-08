@@ -24,17 +24,36 @@ void *__wrap_mmap(void *addr, size_t len, int prot, int flags, int fildes, off_t
 	return latest_mmap_addr;
 }
 
+void test_create (void) {
+	if (tps_create() == -1) {
+		printf("Test TPS Creation Failure: Passed\n");
+	}
+}
+
+void test_read_failure (char *buff) {
+	if (tps_read(100, TPS_SIZE, buff) == -1) {
+		printf("Test TPS Read Failure: Passed\n");
+	}
+}
+
+void test_write_failure (char *buff) {
+	if (tps_write(200, TPS_SIZE, buff) == -1) {
+		printf("Test TPS Write Failure: Passed\n");
+	}
+}
+
 void *thread1(void* arg)
 {
 	char *buffer = malloc(TPS_SIZE);
 	/* Create TPS */
 	tps_create();
+	test_create();
+	test_write_failure(buffer);
 	tps_write(0, TPS_SIZE, msg2);
+	test_read_failure(buffer);
 
 	memset(buffer, 0, TPS_SIZE);
-	tps_read(0, TPS_SIZE, buffer);
-	printf("%s\n", buffer);
-	
+	tps_read(0, TPS_SIZE, buffer);	
 
 
 	/* Get TPS page address as allocated via mmap() */
@@ -45,6 +64,8 @@ void *thread1(void* arg)
 	return NULL;
 }
 
+
+
 void test_read(char *buff) {
 	// memset(buff, 0, TPS_SIZE);
 	// tps_read(0, TPS_SIZE, buff);
@@ -52,6 +73,8 @@ void test_read(char *buff) {
 	assert(!memcmp(msg2, buff, TPS_SIZE));
 	printf("thread2: read OK!\n");
 }
+
+
 
 void *thread2(void* arg) {
 
