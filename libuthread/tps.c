@@ -117,6 +117,8 @@ int tps_init(int segv)
 /* Creates a TPS for current running thread */
 int tps_create(void)
 {
+	pthread_t tid = pthread_self();
+	tps_p currTps = NULL;
 	queue_iterate(tpsQueue, findTid, (void*)tid, (void**)&currTps);
 	
 	if (currTps) {

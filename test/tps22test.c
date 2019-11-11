@@ -42,8 +42,7 @@ void test_write_failure (char *buff) {
 	}
 }
 
-void *thread1(void* arg)
-{
+void *thread1(void* arg) {
 	char *buffer = malloc(TPS_SIZE);
 	/* Create TPS */
 	tps_create();
@@ -55,23 +54,14 @@ void *thread1(void* arg)
 	memset(buffer, 0, TPS_SIZE);
 	tps_read(0, TPS_SIZE, buffer);	
 
-
-	/* Get TPS page address as allocated via mmap() */
-	// char *tps_addr = latest_mmap_addr;
-	
-	/* Cause an intentional TPS protection error */
-	// tps_addr[0] = '\0';
 	return NULL;
 }
 
 
 
 void test_read(char *buff) {
-	// memset(buff, 0, TPS_SIZE);
-	// tps_read(0, TPS_SIZE, buff);
-	printf("%s\n", buff);
-	assert(!memcmp(msg2, buff, TPS_SIZE));
-	printf("thread2: read OK!\n");
+	assert(memcmp(msg2, buff, TPS_SIZE));
+	printf("thread2: read FAILED. Test Passed.\n");
 }
 
 
@@ -81,12 +71,22 @@ void *thread2(void* arg) {
 	char *buffer = malloc(TPS_SIZE);
 
 
-	// char *tps_addr = latest_mmap_addr;
 	tps_read(0, TPS_SIZE, buffer);
 	printf("%s\n", buffer);
 
 	test_read(buffer);
-	// tps_addr[0] = '\0';
+	return NULL;
+}
+
+void *basic_thread_test(void* arg) { 
+	/* Create TPS */
+	tps_create();
+
+	/* Get TPS page address as allocated via mmap() */
+	char *tps_addr = latest_mmap_addr;
+	
+	/* Cause an intentional TPS protection error */
+	tps_addr[0] = '\0';
 	return NULL;
 }
 
@@ -97,10 +97,14 @@ int main(int argc, char **argv)
 	/* Init TPS API */
 	tps_init(1);
 
+	// pthread_create(&tid, NULL, basic_thread_test, NULL);
+
 	/* Create thread 1 and wait */
 	pthread_create(&tid, NULL, thread1, NULL);
 	pthread_create(&tid, NULL, thread2, NULL);
 	pthread_join(tid, NULL);
+
+	
 
 	return 0;
 }
