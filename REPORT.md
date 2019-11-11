@@ -40,7 +40,9 @@ A signal handler to check if a segmentation fault is due to attempting to access
 ## Testing
 2.1
 Initial testing was done with the given testing scripts. Because this testing script includes testing of all of the functions that we needed to implement, we just kept running this script and getting errors at different points until. With each error, we would change the specific function where the crash occurred, until eventually we got the full execution without crashing. 
+
 2.2
 Testing here was done using the blueprint given in discussion. Our testing was implemented in the 'test/tps22test.c' file. We overloaded the mmap() function so we could keep track of the address in the TPS that was returned by this function. Then we would attempt to access this address from other functions or other threads that are not calling read() or write() on this specific TPS. Using the signal handler, we could determine whether these accesses were denied by memory protection. For further testing, we commented this test out and implemented more complex tests that do not seg fault. We also tested the creation, reading, and writing of the TPS by checking the -1 return values for all of the tps functions. These failed returns include ensuring the user can not create another TPS if the current thread has a TPS or if the read/write operations are out of bounds when they are called. Other testing required  creating and writing to a TPS in a thread. After that, try reading from that TPS in another thread. We ensured that this should not be successful. 
+
 2.3
-To do.
+The base test for implementing Copy-on-Write cloning is ensuring that the provided tester still works. The cloning and writing (if the tester encounters a page with a ref count greater than 1) functions are only able to work if the 2.3 implementation was sound. Since the original base tester still worked, we expanded on that by testing the specific parts of our implementation.
